@@ -1,8 +1,15 @@
 // Global variables. These variables don't belong to the player or enemy.
-var canvasWidth = 505, //Can't use ctx.canvas.width when creating Player initially because the canvas doesn't exist yet.
-    canvasHeight = 606;
+var CANVASWIDTH = 505, //Can't use ctx.canvas.width when creating Player initially because the canvas doesn't exist yet.
+    CANVASHEIGHT = 606;
 
 // Enemies our player must avoid
+
+/**
+* @description Represents an enemy, to be avoided.
+* @constructor
+* @param {string} x - The x-axis coordinate
+* @param {string} y - The y-axis coordinate
+*/
 var Enemy = function(x, y) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
@@ -26,13 +33,19 @@ var Enemy = function(x, y) {
     this.speed = this.setRandomSpeed();
 };
 
+/**
+* @description Generates a random number that respresents the speed of the enemy
+* @returns {number} Speed of the enemy
+*/
 Enemy.prototype.setRandomSpeed = function() {
     // Give each enemy a random speed. Makes things a bit more interesting.
      return (Math.random() + 0.25);
 };
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
+/**
+* @description Update the enemy's position
+* @param {number} dt - a time delta between ticks
+*/
 Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
@@ -40,9 +53,12 @@ Enemy.prototype.update = function(dt) {
     this.x = this.x + (this.speed*dt);
     if(this.x > ctx.canvas.width){ // When the enemy moves off the screen reset the enemy.
         this.reset();
-    };
+    }
 };
 
+/**
+* @description Reset the enemy position and speed
+*/
 Enemy.prototype.reset = function() {
     // When the enemy has moved off the screen reset the enemy position and speed.
     // Start the enemy x coordinate off the canvas.
@@ -50,15 +66,17 @@ Enemy.prototype.reset = function() {
     this.speed = this.setRandomSpeed();
 };
 
-// Draw the enemy on the screen, required method for game
+/**
+* @description Draw the enemy on the screen
+*/
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-
+/**
+* @description Represents the player
+* @constructor
+*/
 var Player = function(){
     // Load the image for the sprite
     this.sprite = 'images/char-boy.png';
@@ -79,29 +97,42 @@ var Player = function(){
     this.setScore(0);
 };
 
+/**
+* @description Update the player
+*/
 Player.prototype.update = function() {
     this.checkPlayerBounds();
     this.checkCollisions();
 };
 
+/**
+* @description Getter function for the score
+*/
 Player.prototype.getScore = function() {
-    // getter function for the score.
     return(this.score);
 };
 
-
+/**
+* @description Setter function for the score
+*/
 Player.prototype.setScore = function(val) {
     // setter function for the score.
     this.score = val;
 };
 
+/**
+* @description Reset the player position on the screen
+*/
 Player.prototype.resetPosition = function() {
     // I'm placing the player in the middle of the canvas towards the bottom
-    this.x = canvasWidth/2 - this.width/2;
-    this.y = canvasHeight - this.height - this.bottomOffset;
+    this.x = CANVASWIDTH/2 - this.width/2;
+    this.y = CANVASHEIGHT - this.height - this.bottomOffset;
     console.log("resetPosition");
 };
 
+/**
+* @description Draw the player on the screen
+*/
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 
@@ -110,6 +141,10 @@ Player.prototype.render = function() {
     ctx.fillText("score: " + this.score,5, ctx.canvas.height - 35);
 };
 
+/**
+* @description Interpret the input from the arrow keys
+* @param {string} a
+*/
 Player.prototype.handleInput = function(keyCode) {
     //console.log("keyCode = " + keyCode);
     var horizontalStepSize = 101;
@@ -128,9 +163,12 @@ Player.prototype.handleInput = function(keyCode) {
         case "right":
             this.x = this.x + horizontalStepSize;
             break;
-    };
+    }
 };
 
+/**
+* @description Make sure the player can't move off the canvas and register a score
+*/
 Player.prototype.checkPlayerBounds = function() {
     // Check bounds
     // Prevent player moving off the left side of canvas.
@@ -148,7 +186,7 @@ Player.prototype.checkPlayerBounds = function() {
     // Prevent player moving too far down the canvas.
     else if(this.y > ctx.canvas.height - this.height - this.bottomOffset) {
         this.y = ctx.canvas.height - this.height - this.bottomOffset;
-    };
+    }
 
     // Check if player has reached the water.
     // If so increment the score and reset the player position.
@@ -158,6 +196,9 @@ Player.prototype.checkPlayerBounds = function() {
     }
 };
 
+/**
+* @description Check if there is a collision between player and enemy
+*/
 Player.prototype.checkCollisions = function() {
     for (var i = 0; i < allEnemies.length; i++) {
 
@@ -170,11 +211,11 @@ Player.prototype.checkCollisions = function() {
            this.y < enemy.y + enemy.charHeight &&
            this.charHeight + this.y > enemy.y) {
 
-            console.log("colision");
+            console.log("collision");
             this.setScore(0);
             this.resetPosition();
-        };
-    };
+        }
+    }
 };
 
 // Now instantiate your objects.
