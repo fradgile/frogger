@@ -1,3 +1,7 @@
+// Global variables. These variables don't belong to the player or enemy.
+var canvasWidth = 505, //Can't use ctx.canvas.width when creating Player initially because the canvas doesn't exist yet.
+    canvasHeight = 606;
+
 // Enemies our player must avoid
 var Enemy = function(x, y) {
     // Variables applied to each of our instances go here,
@@ -13,13 +17,18 @@ var Enemy = function(x, y) {
     this.x = x;
     this.y = y;
 
-    // width and height values are used extensively so
-    // I'm creating variables instead of hardcoding all over the place
     this.width = 101;
-    this.height = 171;
+    this.height = 171; // There is quite a bit of clear space here. Above and below the actual character.
 
+    this.charWidth = 95; // This is the actual width of the character. To be used for collisions.
+    this.charHeight = 60;// This is the actual height of the character. To be used for collisions.
+
+    this.speed = this.setRandomSpeed();
+};
+
+Enemy.prototype.setRandomSpeed = function() {
     // Give each enemy a random speed. Makes things a bit more interesting.
-    this.speed = Math.random() + 0.25;
+     return (Math.random() + 0.25);
 };
 
 // Update the enemy's position, required method for game
@@ -32,50 +41,14 @@ Enemy.prototype.update = function(dt) {
     if(this.x > ctx.canvas.width){ // When the enemy moves off the screen reset the enemy.
         this.reset();
     };
-
-    //this.checkCollisions()
-
-
 };
-
-Enemy.prototype.checkCollisions = function() {
-
-    // I want there to be an overlap of the images before a collision is recorded.
-    // To accomplish this I used trial and error to come up with the following values.
-    // The widthOverlap and heightOverlap values make the player image seem small than it is.
-
-    var widthOverlap = 70;
-    var heightOverlap = 30;
-
-    function collides(x, y, width, height, x2, y2, width2, height2) {
-        return (x < x2 + width2 && x + width > x2 &&
-                y < y2 + height2 && height + y > y2);
-    };
-
-    if(collides(this.x,
-                this.y,
-                this.width,
-                this.height,
-//                player.x + widthOverlap,
-//                player.y + heightOverlap,
-//                player.width - widthOverlap,
-//                player.height - heightOverlap)) {
-                player.x, // + 30,
-                player.y, // + 80,
-                player.width, // - 40,
-                player.height)){ // - 90)) {
-        console.log("colision");
-        player.resetScore();
-        player.resetPosition();
-    };
-};
-
 
 Enemy.prototype.reset = function() {
-    this.x = this.width * (-1); // Start the enemy x coordinate off the canvas
-    this.speed = Math.random() + 0.25;
+    // When the enemy has moved off the screen reset the enemy position and speed.
+    // Start the enemy x coordinate off the canvas.
+    this.x = this.width * (-1);
+    this.speed = this.setRandomSpeed();
 };
-
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
@@ -87,28 +60,23 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 
 var Player = function(){
-
-    this.canvasWidth = 505;
-    this.canvasHeight = 606;
-
     // Load the image for the sprite
     this.sprite = 'images/char-boy.png';
 
-    // width and height values are used extensively so
-    // I'm creating variables instead of hardcoding all over the place
-    //this.width = 76;
-    //this.height = 85;
+    this.width = 101; // There is quite a bit of clear space here. Left and right the actual character.
+    this.height = 171;// There is quite a bit of clear space here. Above and below the actual character.
 
-    this.width = 101;
-    this.height = 171;
+    this.charWidth = 60; // This is the actual width of the character. To be used for collisions.
+    this.charHeight = 60;// This is the actual height of the character. To be used for collisions.
 
-    // Setting the Enemy initial location - x, y coordinates
-    // I'm placing the player in the middle of the canvas towards the bottom
-    this.x = this.canvasWidth/2 - this.width/2;
-    this.y = this.canvasHeight - this.height + 150;
+    this.bottomOffset = 32; // Used to position the player correctly at the bottom of the canvas.
 
-    // Initial score is zero
-    this.score = 0;
+    this.x;
+    this.y;
+    this.resetPosition();
+
+    this.score;
+    this.setScore(0);
 };
 
 Player.prototype.update = function() {
@@ -116,23 +84,22 @@ Player.prototype.update = function() {
     this.checkCollisions();
 };
 
-Player.prototype.setScore = function(val) {
-    this.score = this.score + val;
-    console.log("score = " + this.score);
-};
-
 Player.prototype.getScore = function() {
-    return this.score;
+    // getter function for the score.
+    return(this.score);
 };
 
-Player.prototype.resetScore = function() {
-    this.score = 0;
-    console.log("score = " + this.score);
+
+Player.prototype.setScore = function(val) {
+    // setter function for the score.
+    this.score = val;
 };
 
 Player.prototype.resetPosition = function() {
-    this.x = this.canvasWidth/2 - this.width/2;
-    this.y = this.canvasHeight - this.height - 50;
+    // I'm placing the player in the middle of the canvas towards the bottom
+    this.x = canvasWidth/2 - this.width/2;
+    this.y = canvasHeight - this.height - this.bottomOffset;
+    console.log("resetPosition");
 };
 
 Player.prototype.render = function() {
@@ -144,21 +111,22 @@ Player.prototype.render = function() {
 };
 
 Player.prototype.handleInput = function(keyCode) {
-    console.log("keyCode = " + keyCode);
-    var stepSize = 20;  // I came up with 20 through trial and error.
+    //console.log("keyCode = " + keyCode);
+    var horizontalStepSize = 101;
+    var verticalStepSize = 82;
 
     switch(keyCode) {
         case "up":
-            this.y = this.y - stepSize;
+            this.y = this.y - verticalStepSize;
             break;
         case "down":
-            this.y = this.y + stepSize;
+            this.y = this.y + verticalStepSize;
             break;
         case "left":
-            this.x = this.x - stepSize;
+            this.x = this.x - horizontalStepSize;
             break;
         case "right":
-            this.x = this.x + stepSize;
+            this.x = this.x + horizontalStepSize;
             break;
     };
 };
@@ -178,50 +146,49 @@ Player.prototype.checkPlayerBounds = function() {
         this.y = 0;
     }
     // Prevent player moving too far down the canvas.
-    else if(this.y > ctx.canvas.height - this.height -55) {
-        this.y = ctx.canvas.height - this.height -55;
+    else if(this.y > ctx.canvas.height - this.height - this.bottomOffset) {
+        this.y = ctx.canvas.height - this.height - this.bottomOffset;
     };
 
     // Check if player has reached the water.
     // If so increment the score and reset the player position.
     if(this.y <= 50) {
-        this.setScore(1);
+        this.setScore(this.getScore() + 1);
         this.resetPosition();
     }
 };
 
 Player.prototype.checkCollisions = function() {
-  for (var i = 0; i < allEnemies.length; i++) {
+    for (var i = 0; i < allEnemies.length; i++) {
 
-    var enemy = allEnemies[i];
+        var enemy = allEnemies[i];
 
-    if (this.x >= enemy.x + 0 &&
-        this.x < enemy.x + 100 &&
-        this.y >= enemy.y + 0 &&
-        this.y < enemy.y + 85) {
+        // Axis-Aligned Bounding Box collision detection.
+        // https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+        if (this.x < enemy.x + enemy.charWidth &&
+           this.x + this.charWidth > enemy.x &&
+           this.y < enemy.y + enemy.charHeight &&
+           this.charHeight + this.y > enemy.y) {
+
             console.log("colision");
-            this.resetScore();
+            this.setScore(0);
             this.resetPosition();
-        }
-    }
+        };
+    };
 };
-
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 allEnemies = [];
 
 // Start the enemies moving at random start times.
-
 setTimeout(function(){
-    //allEnemies.push(new Enemy(0, 60 + 83));
     allEnemies.push(new Enemy(-101, 60));
 }, Math.floor((Math.random() * 2000) + 1));
 
 setTimeout(function(){
     allEnemies.push(new Enemy(-101, 60 + 83));
 }, Math.floor((Math.random() * 2000) + 1));
-
 
 setTimeout(function(){
     allEnemies.push(new Enemy(-101, 60 + 83 + 83));

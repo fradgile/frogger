@@ -1,6 +1,12 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-Students should use this [rubric](https://www.udacity.com/course/viewer/#!/c-nd001/l-2696458597/m-2687128535) for self-checking their submission.
+To run Frogger download the github repository and run the index.html file in a browser.
 
-For detailed instructions on how to get started, check out this [guide](https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc/pub?embedded=true).
+Use your arrow keys: Up, down, left or right to move the player.
+
+To replay the game refresh the browser.
+
+When you make it to the water your score will increase by 1.
+When you collide with a bug your score will be reset to 0.
+The game last for 100 seconds.

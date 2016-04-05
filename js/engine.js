@@ -25,7 +25,7 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d'),
         lastTime,
         startTime = Date.now(),
-        gameTime = 100,
+        gameTime = 100, // Game will last for 100 seconds
         stopTime = startTime + (gameTime*1000),
         gameTimeRemaining;
 
@@ -45,7 +45,6 @@ var Engine = (function(global) {
          */
         var now = Date.now(),
             dt = (now - lastTime) / 10.0;
-//            dt = (now - lastTime) / 1000.0;
 
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
@@ -61,7 +60,7 @@ var Engine = (function(global) {
         gameTimeRemaining = Math.ceil( (stopTime - now)/1000 );
         global.gameTimeRemaining = gameTimeRemaining; // Make gameTimeRemaining available to app.js
 
-        if(now >= stopTime){
+        if(now >= stopTime){ //GameOver
             gameTimeRemaining = 0;
 
             ctx.font = "20px Arial";
@@ -69,12 +68,11 @@ var Engine = (function(global) {
 
             ctx.font = "40px Arial";
             ctx.fillText("Game Over",ctx.canvas.width/2 - 100, ctx.canvas.height/2);
-            console.log("Game Over");
+            //console.log("Game Over");
         }else{
             /* Use the browser's requestAnimationFrame function to call this
              * function again as soon as the browser is able to draw another frame.
              */
-            //console.log("now - startTime = " + (now - startTime)/1000);
             win.requestAnimationFrame(main);
 
             ctx.font = "20px Arial";
@@ -196,8 +194,8 @@ var Engine = (function(global) {
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
-        'images/enemy-bug-resize.png',
-        'images/char-boy-resize.png',
+        'images/enemy-bug-solid.png',
+        'images/char-boy-solid.png',
         'images/star.png'
     ]);
     Resources.onReady(init);
